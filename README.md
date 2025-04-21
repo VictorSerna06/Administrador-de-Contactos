@@ -34,6 +34,7 @@
 <h4>3.- Ejecuta la aplicación:</h4>
 <p>java com.vgomez.contactmanager.Main</p>
 <h2>Ejemplo de uso</h2>
+
 ![MenuContactManager](https://github.com/user-attachments/assets/6e9ddda2-4e3a-4122-a040-8812232a5e69)
 <h2>Validaciones</h2>
 <ul>

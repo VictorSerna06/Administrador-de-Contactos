@@ -59,4 +59,4 @@
   <li>Interfaz gráfica</li>
 </ul>
 <h2>Autor</h2>
-<p>Desarrollado por <strong>VictorSerna06</strong></p>
+<p>Desarrollado por <strong>@VictorSerna06</strong></p>

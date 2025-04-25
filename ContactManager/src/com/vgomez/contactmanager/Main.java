@@ -4,9 +4,13 @@ import com.vgomez.contactmanager.exceptions.ContactNoFoundException;
 import com.vgomez.contactmanager.exceptions.DeleteFailedContact;
 import com.vgomez.contactmanager.exceptions.EmptyException;
 import com.vgomez.contactmanager.exceptions.NoContactException;
+import com.vgomez.contactmanager.model.Contact;
+import com.vgomez.contactmanager.service.ContactService;
 import com.vgomez.contactmanager.validator.Validator;
 
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -28,10 +32,11 @@ public class Main {
             3.- Buscar contacto
             4.- Editar contacto
             5.- Eliminar contacto
-            6.- Salir
+            6.- Filtrar contactos por letra inicial
+            7.- Salir
             """;
 
-    private static final String CHARACTER = "**********************************************************";
+    private static final String CHARACTER = "***************************************************************";
 
     public static void main(String[] args) {
 
@@ -48,7 +53,7 @@ public class Main {
     Muestra el menú principal de opciones y gestiona la interacción con el usuario
     Utiliza un bucle para recibir entradas hasta que el usuario decida salir
     */
-    private static void mostrarMenu(ContactService contactService){
+    private static void mostrarMenu(ContactService contactService) {
 
         System.out.println(MENU);
         try {
@@ -75,6 +80,10 @@ public class Main {
                         deleteContact(contactService);
                         break;
                     case "6":
+                        System.out.println();
+                        filterByInitial(contactService);
+                        break;
+                    case "7":
                     case "salir":
                         System.out.println("Programa finalizado.");
                         System.exit(0);
@@ -89,21 +98,22 @@ public class Main {
     }
 
     /*
-    Muestra todos los usuarios almacenados en consola
+    Muestra todos los usuarios almacenados en consola, también muestra cuantos usuarios se encontrarón
     Si no hay contactos o ocurre un error, se muestra un mensaje apropiado
     */
     private static void listContacts(ContactService contactService) {
         try {
-            if (!contactService.getAllContacts().isEmpty()) {
-                System.out.println(CHARACTER);
-                System.out.println("Lista de contactos:\n");
+            List<Contact> contacts = contactService.getAllContacts();
+            if (!contacts.isEmpty()) {
+                printSeparator();
+                System.out.println("Lista de contactos:\t\t\t" + "Contactos encontrados: " + contacts.size() + "\n");
                 contactService.getAllContacts().forEach(System.out::println);
-                System.out.println(CHARACTER);
+                printSeparator();
             }
         } catch (ContactNoFoundException e) {
-            System.out.println(CHARACTER);
+            printSeparator();
             System.out.println(e.getMessage());
-            System.out.println(CHARACTER);
+            printSeparator();
         }
     }
 
@@ -120,33 +130,33 @@ public class Main {
             String number = S.nextLine().trim();
 
             if (name.isEmpty() || email.isEmpty() || number.isEmpty()) {
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("Ningún campo debe estar vacío, intentalo de nuevo.");
-                System.out.println(CHARACTER);
+                printSeparator();
                 continue;
             } else if (!Validator.isValidEmail(email)) {
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("El email no es valido, intentalo de nuevo.");
-                System.out.println(CHARACTER);
+                printSeparator();
                 continue;
             } else if (!Validator.isValidPhone(number)) {
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("El número de teléfono no es valido, intentalo de nuevo.");
-                System.out.println(CHARACTER);
+                printSeparator();
                 continue;
             } else if (!Validator.isValidName(name)) {
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("El nombre no es valido, intentalo de nuevo.");
-                System.out.println(CHARACTER);
+                printSeparator();
                 continue;
             } else {
                 try {
                     Contact contact = new Contact(name, email, number);
                     contactService.addContact(contact);
                     System.out.println();
-                    System.out.println(CHARACTER);
+                    printSeparator();
                     System.out.println("Contacto guardado.");
-                    System.out.println(CHARACTER);
+                    printSeparator();
                 } catch (NoContactException e) {
                     System.out.println(e.getMessage());
                 }
@@ -165,33 +175,33 @@ public class Main {
             System.out.println("Ingresa el nombre del contacto que deseas buscar:");
             String name = S.nextLine();
             if (name.isEmpty()) {
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("El campo nombre no puede estar vacío, intentalo de nuevo.");
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println();
                 continue;
             }
             Contact found = contactService.searchByName(name);
             if (found == null) {
                 System.out.println();
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("El contacto '" + name + "' no fue encontrado, intentalo de nuevo");
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println();
                 continue;
             } else {
                 try {
                     System.out.println();
-                    System.out.println(CHARACTER);
+                    printSeparator();
                     System.out.println("Contacto encontrado:");
                     System.out.println();
                     System.out.println(found);
-                    System.out.println(CHARACTER);
+                    printSeparator();
                     break;
                 } catch (NoContactException e) {
-                    System.out.println(CHARACTER);
+                    printSeparator();
                     System.out.println(e.getMessage());
-                    System.out.println(CHARACTER);
+                    printSeparator();
                 }
 
             }
@@ -199,16 +209,16 @@ public class Main {
     }
 
     /*
-    Permite modificar un campo especifico de un contacto existente
+    Permite modificar un campo específico de un contacto existente
     Solicita nombre del contacto, campo a modificar y el nuevo valor
     */
     public static void updateContact(ContactService contactService) {
         System.out.println("Ingresa el nombre del contacto que deseas actualizar:");
         String name = S.nextLine();
         if (name.isEmpty()) {
-            System.out.println(CHARACTER);
+            printSeparator();
             System.out.println("El campo nombre no puede estar vacío");
-            System.out.println(CHARACTER);
+            printSeparator();
         } else {
             while (true) {
                 System.out.println("Ingresa el campo que deseas editar (name | email | phone):");
@@ -217,24 +227,24 @@ public class Main {
                     System.out.println("Ingresa el nuevo dato:");
                     String updateData = S.nextLine();
                     if (updateData.isEmpty()) {
-                        System.out.println(CHARACTER);
+                        printSeparator();
                         System.out.println("Ningún campo puede estar vacío.");
-                        System.out.println(CHARACTER);
+                        printSeparator();
                         continue;
                     }
                     try {
                         boolean isuptade = contactService.edit(name, field, updateData);
                         if (isuptade) {
                             System.out.println();
-                            System.out.println(CHARACTER);
+                            printSeparator();
                             System.out.println("Contacto actualizado.");
-                            System.out.println(CHARACTER);
+                            printSeparator();
                             break;
                         } else {
                             System.out.println();
-                            System.out.println(CHARACTER);
+                            printSeparator();
                             System.out.println("Contacto no encontrado.");
-                            System.out.println(CHARACTER);
+                            printSeparator();
                             break;
                         }
                     } catch (NoContactException e) {
@@ -243,9 +253,9 @@ public class Main {
                     }
                 } else {
                     System.out.println();
-                    System.out.println(CHARACTER);
+                    printSeparator();
                     System.out.println("Campo invalido, vuelve a intentarlo.");
-                    System.out.println(CHARACTER);
+                    printSeparator();
                     System.out.println();
                 }
             }
@@ -263,23 +273,64 @@ public class Main {
             boolean isRemove = contactService.removeByName(name);
             if (isRemove) {
                 System.out.println();
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("Contacto eliminado.");
-                System.out.println(CHARACTER);
+                printSeparator();
             } else {
                 System.out.println();
-                System.out.println(CHARACTER);
+                printSeparator();
                 System.out.println("Contacto '" + name + "' no encontrado.");
-                System.out.println(CHARACTER);
+                printSeparator();
             }
         } catch (EmptyException e) {
-            System.out.println(CHARACTER);
+            printSeparator();
             System.out.println("El nombre de usuario no puede estar vacío.");
-            System.out.println(CHARACTER);
+            printSeparator();
         } catch (DeleteFailedContact e) {
-            System.out.println(CHARACTER);
+            printSeparator();
             System.out.println("El campo nombre esta vacío, por lo que el contacto\n no fue encontrado y no fue posible eliminar.");
-            System.out.println(CHARACTER);
+            printSeparator();
         }
+    }
+
+    /*
+    Muestra los contactos de acuerdo a la letra ingresada
+    Si se ingresa más de una letra o si no se encuentra algún contacto con esa letra se
+    muestra un menaje personalizado
+    */
+    public static void filterByInitial(ContactService contactService) {
+        System.out.println("Ingresa la letra inicial por la cual deseas filtrar:");
+        String initial = S.nextLine();
+
+        if (initial.length() != 1 || !Character.isLetter(initial.charAt(0))) {
+            printSeparator();
+            System.out.println("Debes ingresar solo una letra.");
+            printSeparator();
+            return;
+        }
+
+        char firstLetter = Character.toLowerCase(initial.charAt(0));
+
+        List<Contact> matches = contactService.getAllContacts().stream().filter(
+                        c -> Character.toLowerCase(c.getName().charAt(0)) == firstLetter).
+                collect(Collectors.toList());
+
+        if (matches.isEmpty()) {
+            System.out.println();
+            printSeparator();
+            System.out.println("No se encontraron contactos que empiecen con la letra: " + initial);
+            printSeparator();
+        } else {
+            System.out.println();
+            printSeparator();
+            System.out.println("Contactos que empiezan con '" + initial.toUpperCase() + "'\t\t" + matches.size() + " contactos encontrados.\n");
+            matches.forEach(System.out::println);
+            printSeparator();
+        }
+    }
+
+    // Imprime una serie de caracteres para mejorar la salida en consola
+    public static void printSeparator() {
+        System.out.println(CHARACTER);
     }
 }

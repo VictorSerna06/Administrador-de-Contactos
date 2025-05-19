@@ -8,7 +8,7 @@
   <li>Eliminar contactos</li>
   <li>Listar contactos</li>
 </ul>
-<p>Utilizando un menú interactivo, el proyecto incluye entradas y manejo de excepciones personalizadas, además de persistencia de datos en archivos de texto.</p>
+<p>Utilizando un menú interactivo, el proyecto incluye entradas y manejo de excepciones personalizadas, además de persistencia de datos en memoria.</p>
 <h2>Caracteristicas</h2>
 <ul>
   <li>Listado de todos los contactos</li>
